@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Concept | نظام الإدارة</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+  :root {
+    --gold: #000000;
+    --gold-light: #333333;
+    --gold-dark: #000000;
+    --black: #ffffff;
+    --dark: #b2b2b2;
+    --card: #ffffff;
+    --card2: #f9f9f9;
+    --text: rgb(0, 0, 0);
+    --muted: #555555;
+    --red: #E05050;
+    --green: #50C878;
+    --blue: #5090E0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--black);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  .sidebar {
+    width: 260px;
+    background: #f0f0f0;
+    border-left: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo-area{
+    padding:20px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+
+  .logo-img{
+    width:200px;
+    height:auto;
+    object-fit:contain;
+    display:block;
+  }
+
+  .nav { flex: 1; padding: 16px 0; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 18px;
+    font-weight: 600;
+    transition: all 0.2s;
+    border-right: 3px solid transparent;
+  }
+
+  .nav-item:hover { color: var(--text); background: #e0e0e0; }
+  .nav-item.active { color: var(--gold); border-right-color: var(--gold); background: rgba(0, 0, 0, 0.08); }
+  .nav-item .icon { font-size: 22px; min-width: 22px; }
+
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid #ccc;
+    font-size: 15px;
+    color: #555;
+    text-align: center;
+  }
+
+  /* MAIN */
+  .main {
+    flex: 1;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .topbar {
+    background: #e4e4e4;
+    border-bottom: 1px solid #ccc;
+    padding: 16px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar h1 { font-size: 24px; font-weight: 700; color: var(--text); }
+  .topbar .date { font-size: 17px; color: var(--muted); }
+
+  .content { padding: 28px; }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .card-gold { border-color: var(--gold-dark); }
+
+  /* GRID */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+  /* STAT CARDS */
+  .stat-card {
+    background: var(--card);
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .stat-card .stat-icon { font-size: 32px; }
+  .stat-card .stat-val { font-size: 36px; font-weight: 900; color: var(--gold); }
+  .stat-card .stat-label { font-size: 17px; color: var(--muted); }
+
+  /* BUTTONS */
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+
+  .btn-gold { background: #000000; color: #ffffff; border-color: #000000; }
+  .btn-gold:hover { background: #333333; }
+  .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+  .btn-outline:hover { background: rgba(0,0,0,0.05); }
+  .btn-danger { background: var(--red); color: white; border-color: var(--red); }
+  .btn-danger:hover { opacity: 0.85; }
+  .btn-sm { padding: 4px 10px; font-size: 15px; }
+  .btn-green { background: var(--green); color: white; border-color: var(--green); }
+
+  /* FORM */
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 17px; color: var(--text); margin-bottom: 6px; font-weight: 600; }
+
+  .form-control {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    font-size: 18px;
+    transition: border-color 0.2s;
+  }
+
+  .form-control:focus { outline: none; border-color: var(--gold); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card);
+    border: 2px solid var(--gold-dark);
+    border-radius: 16px;
+    padding: 28px;
+    width: 500px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal h2 { font-size: 22px; color: var(--gold); margin-bottom: 20px; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 17px;
+  }
+
+  th {
+    background: #f0f0f0;
+    padding: 12px 14px;
+    text-align: right;
+    color: #000;
+    font-weight: 700;
+    font-size: 16px;
+    border-bottom: 2px solid #ccc;
+  }
+
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: middle;
+  }
+
+  tr:hover td { background: rgba(0,0,0,0.01); }
+
+  /* BADGES */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .badge-gold { background: rgba(0,0,0,0.05); color: #000; border: 1px solid #000; }
+  .badge-green { background: rgba(80,200,120,0.15); color: var(--green); border: 1px solid var(--green); }
+  .badge-red { background: rgba(224,80,80,0.15); color: var(--red); border: 1px solid var(--red); }
+  .badge-blue { background: rgba(80,144,224,0.15); color: var(--blue); border: 1px solid var(--blue); }
+  .badge-muted { background: #e0e0e0; color: #555; }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::before {
+    content: '';
+    display: block;
+    width: 3px;
+    height: 18px;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+
+  .tab-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active { background: var(--gold); color: white; border-color: var(--gold); }
+
+  /* SEARCH & EXPORT BAR */
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+
+  .search-bar input { flex: 1; }
+
+  /* MEMBER CARD */
+  .member-card {
+    background: var(--card2);
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+
+  .member-card:hover { border-color: var(--gold-dark); }
+  .member-card .member-info { display: flex; align-items: center; gap: 14px; cursor: pointer; flex: 1; }
+  
+  .avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: #000000;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 900; color: #ffffff;
+  }
+
+  .member-name { font-size: 19px; font-weight: 700; }
+  .member-sub { font-size: 16px; color: var(--muted); margin-top: 2px; }
+
+  /* CREDIT BAR */
+  .credit-bar-wrap { margin: 4px 0; }
+  .credit-bar-track { background: #ddd; border-radius: 4px; height: 6px; overflow: hidden; }
+  .credit-bar-fill { height: 100%; background: #000; border-radius: 4px; transition: width 0.4s; }
+
+  /* APPOINTMENT CARD */
+  .appt-card {
+    background: var(--card2);
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .appt-time { font-size: 24px; font-weight: 900; color: var(--gold); }
+  .appt-type { font-size: 16px; color: var(--muted); margin-top: 2px; }
+
+  /* CALENDAR GRID */
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 20px;
+  }
+
+  .cal-day-header { text-align: center; font-size: 16px; color: var(--muted); font-weight: 700; padding: 6px 0; }
+
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 17px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    position: relative;
+    transition: all 0.15s;
+  }
+
+  .cal-day:hover { background: #e0e0e0; }
+  .cal-day.today { border-color: var(--gold); color: var(--gold); font-weight: 700; }
+  .cal-day.has-appt::after {
+    content: ''; position: absolute; bottom: 4px;
+    width: 10px; height: 10px; border-radius: 50%; background: var(--gold);
+  }
+
+  .cal-day.selected { background: var(--gold); color: white; font-weight: 700; }
+  .cal-day.empty { cursor: default; }
+
+  /* PRICE TABLE */
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .price-row:last-child { border-bottom: none; }
+  .price-row .price-name { font-weight: 600; font-size: 18px; }
+  .price-row .price-save { font-size: 15px; color: var(--green); }
+  .price-row .price-val { font-size: 26px; font-weight: 900; color: var(--gold); }
+  .price-row .price-jd { font-size: 16px; color: var(--muted); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--gold);
+    color: white;
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 18px;
+    z-index: 999;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
+  .empty-state .empty-icon { font-size: 52px; margin-bottom: 12px; }
+
+  .quick-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f0f0f0; }
+  ::-webkit-scrollbar-thumb { background: #bbb; border-radius: 3px; }
+
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .detail-item label { font-size: 15px; color: var(--muted); display: block; margin-bottom: 3px; }
+  .detail-item span { font-size: 18px; font-weight: 600; }
+
+  .alert { padding: 12px 16px; border-radius: 8px; font-size: 17px; margin-bottom: 16px; }
+  .alert-warning { background: rgba(0,0,0,0.05); border: 1px solid #ccc; color: #000; }
+  .alert-danger { background: rgba(224,80,80,0.1); border: 1px solid var(--red); color: var(--red); }
+
+  .export-panel {
+    background: #fcfcfc;
+    border: 1px dashed #aaa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  .export-options {
+    display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo-area">
+    <img src="./assets/THE CONCEPT LOGO trace.png" alt="The Concept Logo" class="logo-img">
+  </div>
+  <nav class="nav">
+    <div class="nav-item active" onclick="showPage('dashboard', this)"><span class="icon">🏠</span> لوحة التحكم</div>
+    <div class="nav-item" onclick="showPage('members', this)"><span class="icon">👥</span> الأعضاء</div>
+    <div class="nav-item" onclick="showPage('subscriptions', this)"><span class="icon">📋</span> الاشتراكات</div>
+    <div class="nav-item" onclick="showPage('appointments', this)"><span class="icon">📅</span> المواعيد</div>
+    <div class="nav-item" onclick="showPage('sessions', this)"><span class="icon">💪</span> الحصص المباعة</div>
+    <div class="nav-item" onclick="showPage('prices', this)"><span class="icon">💰</span> قائمة الأسعار</div>
+    <div class="nav-item" onclick="showPage('reports', this)"><span class="icon">📊</span> التقارير</div>
+    <div class="nav-item" onclick="showPage('export', this)"><span class="icon">📥</span> استخراج البيانات</div>
+  </nav>
+  <div class="sidebar-footer">Osama Shamout © 2026</div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <h1 id="page-title">لوحة التحكم</h1>
+    <span class="date" id="top-date"></span>
+  </div>
+  <div class="content">
+
+    <div class="page active" id="page-dashboard">
+      <div class="grid-4" style="margin-bottom:24px">
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-val" id="stat-members">0</div>
+          <div class="stat-label">إجمالي الأعضاء</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-val" id="stat-active">0</div>
+          <div class="stat-label">اشتراكات نشطة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-val" id="stat-today-appts">0</div>
+          <div class="stat-label">مواعيد اليوم</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-val" id="stat-revenue">0</div>
+          <div class="stat-label">إيرادات هذا الشهر (JD)</div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <button class="btn btn-gold" onclick="openAddMember()">+ إضافة عضو جديد</button>
+        <button class="btn btn-outline" onclick="openAddAppointment()">+ حجز موعد</button>
+        <button class="btn btn-outline" onclick="openSellSession()">+ بيع حصص</button>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-title">مواعيد اليوم</div>
+          <div id="dash-today-appts"></div>
+        </div>
+        <div class="card">
+          <div class="section-title">تحذيرات النقاط المنخفضة</div>
+          <div id="dash-low-credits"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-members">
+      <div class="search-bar">
+        <input class="form-control" id="member-search" placeholder="🔍  ابحث باسم العضو أو رقم الهاتف..." oninput="renderMembers()">
+        <button class="btn btn-gold" onclick="openAddMember()">+ عضو جديد</button>
+      </div>
+      <div id="members-list"></div>
+    </div>
+
+    <div class="page" id="page-subscriptions">
+      <div style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="filterSubs('all', this)">الكل</button>
+          <button class="tab-btn" onclick="filterSubs('active', this)">نشط</button>
+          <button class="tab-btn" onclick="filterSubs('expired', this)">منتهي</button>
+        </div>
+        <button class="btn btn-gold" onclick="openAddSubscription()">+ اشتراك جديد</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>العضو</th>
+                <th>نوع الاشتراك</th>
+                <th>تاريخ البداية</th>
+                <th>تاريخ الانتهاء</th>
+                <th>النقاط المتبقية</th>
+                <th>الحالة</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="subs-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-appointments">
+      <div style="display:flex;gap:16px;margin-bottom:20px;align-items:flex-start">
+        <div style="flex:1">
+          <div class="card" style="margin-bottom:16px">
+            <div class="section-title">التقويم</div>
+            <div id="cal-month-year" style="text-align:center;font-size:19px;font-weight:700;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:12px">
+              <button class="btn btn-sm btn-outline" onclick="changeMonth(-1)">‹</button>
+              <span id="cal-month-label"></span>
+              <button class="btn btn-sm btn-outline" onclick="changeMonth(1)">›</button>
+            </div>
+            <div class="cal-grid" id="cal-headers"></div>
+            <div class="cal-grid" id="cal-days"></div>
+          </div>
+        </div>
+        <div style="flex:1">
+          <div class="card">
+            <div class="section-title" id="appt-day-title">مواعيد اليوم</div>
+            <button class="btn btn-gold btn-sm" style="margin-bottom:14px" onclick="openAddAppointment()">+ إضافة موعد</button>
+            <div id="appt-day-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-sessions">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div></div>
+        <button class="btn btn-gold" onclick="openSellSession()">+ بيع حصص جديدة</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>العضو</th>
+                <th>الباقة</th>
+                <th>إجمالي الحصص</th>
+                <th>الحصص المستخدمة</th>
+                <th>المتبقي</th>
+                <th>السعر (JD)</th>
+                <th>التاريخ</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="sessions-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-prices">
+      <div style="margin-bottom: 15px; text-align: left;">
+        <button class="btn btn-gold" onclick="openEditPricesModal()">⚙️ تعديل قائمة الأسعار</button>
+      </div>
+      <div class="grid-2">
+        <div class="card card-gold">
+          <div class="section-title">🎯 الاشتراكات الشهرية الخاصة</div>
+          <div id="prices-tier-container"></div>
+          <div style="background:#e0e0e0;border-radius:8px;padding:14px;margin-top:12px">
+            <div style="font-size:16px;color:var(--gold);font-weight:700;margin-bottom:8px">📌 دليل الحجز الديناميكي</div>
+            <div style="font-size:16px;margin-bottom:4px">⚪ Off-Peak (11 ص – 4 م): 1 نقطة</div>
+            <div style="font-size:16px;">🟡 Peak (6-9:30 ص & 4:30-8:30 م): 1.5 نقطة</div>
+          </div>
+        </div>
+        <div class="card card-gold">
+          <div class="section-title">💪 الحصص المباعة (Pay As You Go)</div>
+          <div id="prices-paygo-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-reports">
+      <div class="grid-3" style="margin-bottom:24px">
+        <div class="card">
+          <div class="section-title">📊 الأعضاء حسب الاشتراك</div>
+          <div id="report-by-sub"></div>
+        </div>
+        <div class="card">
+          <div class="section-title">💰 مبيعات الحصص</div>
+          <div id="report-sessions"></div>
+        </div>
+        <div class="card">
+          <div class="section-title">📅 مواعيد هذا الشهر</div>
+          <div id="report-appts"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">📋 آخر الأنشطة</div>
+        <div id="report-activity"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-export">
+      <div class="card">
+        <div class="section-title">📥 استخراج وحفظ البيانات المخصصة</div>
+        <p style="margin-bottom: 15px;">حدد البيانات التي ترغب في تضمينها داخل التقرير المستخرج:</p>
+        
+        <div class="export-panel">
+          <div style="margin-bottom: 10px;"><input type="checkbox" id="chk-exp-members" checked> <label style="font-weight:700;" for="chk-exp-members">سجل الأعضاء المشتركين</label></div>
+          <div style="margin-bottom: 10px;"><input type="checkbox" id="chk-exp-subs" checked> <label style="font-weight:700;" for="chk-exp-subs">سجل الاشتراكات الشهرية</label></div>
+          <div style="margin-bottom: 10px;"><input type="checkbox" id="chk-exp-appts" checked> <label style="font-weight:700;" for="chk-exp-appts">سجل المواعيد والجدولة</label></div>
+          <div><input type="checkbox" id="chk-exp-sessions" checked> <label style="font-weight:700;" for="chk-exp-sessions">سجل الحصص المباعة</label></div>
+        </div>
+
+        <div class="export-options">
+          <button class="btn btn-green" onclick="exportToExcelCustom()">📊 تصدير بصيغة Excel (CSV)</button>
+          <button class="btn btn-gold" onclick="exportToPDFCustom()">📄 طباعة / حفظ كملف PDF</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="modal-overlay" id="modal-add-member">
+  <div class="modal">
+    <h2 id="member-modal-title">👤 إضافة عضو جديد</h2>
+    <input type="hidden" id="m-edit-id">
+    <div class="form-group">
+      <label>الاسم الكامل *</label>
+      <input class="form-control" id="m-name" placeholder="مثال: أحمد محمد">
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>رقم الهاتف</label>
+        <input class="form-control" id="m-phone" placeholder="07x-xxx-xxxx">
+      </div>
+      <div class="form-group">
+        <label>البريد الإلكتروني</label>
+        <input class="form-control" id="m-email" placeholder="example@email.com" dir="ltr">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>تاريخ الميلاد</label>
+        <input class="form-control" id="m-dob" type="date">
+      </div>
+      <div class="form-group">
+        <label>الجنس</label>
+        <select class="form-control" id="m-gender">
+          <option value="ذكر">ذكر</option>
+          <option value="أنثى">أنثى</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>ملاحظات</label>
+      <input class="form-control" id="m-notes" placeholder="أي ملاحظات خاصة...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-member')">إلغاء</button>
+      <button class="btn btn-gold" onclick="saveMember()">💾 حفظ البيانات</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-post-member">
+  <div class="modal" style="text-align: center;">
+    <h2>🎉 تم حفظ العضو بنجاح!</h2>
+    <p style="margin-bottom: 20px; font-size: 16px;">ما هي الخطوة التالية التي ترغب في القيام بها لهذا العضو؟</p>
+    <input type="hidden" id="post-member-id">
+    
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <button class="btn btn-gold" onclick="triggerPostAction('sub')">📋 تسجيل اشتراك شهري جديد</button>
+      <button class="btn btn-outline" onclick="triggerPostAction('appt')">📅 حجز موعد تدريب فوري</button>
+      <button class="btn btn-sm" style="background:#e0e0e0;" onclick="closeModal('modal-post-member')">⏭️ تخطي والعودة للقائمة</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-sub">
+  <div class="modal">
+    <h2 id="sub-modal-title">📋 إضافة اشتراك شهري</h2>
+    <input type="hidden" id="sub-edit-id">
+    <div class="form-group">
+      <label>العضو *</label>
+      <select class="form-control" id="sub-member"></select>
+    </div>
+    <div class="form-group">
+      <label>نوع الاشتراك *</label>
+      <select class="form-control" id="sub-type" onchange="updateSubDetails()">
+        <option value="">-- اختر --</option>
+        <option value="starter">مسار البداية (Starter Rhythm)</option>
+        <option value="core">زخم الانطلاق (Core Momentum)</option>
+        <option value="dedicated">عزيمة الإلتزام (The Dedicated)</option>
+        <option value="elite">وتيرة النخبة (Elite Private)</option>
+      </select>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>تاريخ البداية *</label>
+        <input class="form-control" id="sub-start" type="date">
+      </div>
+      <div class="form-group">
+        <label>تاريخ الانتهاء</label>
+        <input class="form-control" id="sub-end" type="date" readonly>
+      </div>
+    </div>
+    <div class="form-group" id="sub-edit-credits-group" style="display:none;">
+      <label>النقاط المتبقية المتوفرة حالياً</label>
+      <input class="form-control" type="number" step="0.5" id="sub-credits-left">
+    </div>
+    <div id="sub-preview" style="display:none" class="alert alert-warning"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-sub')">إلغاء</button>
+      <button class="btn btn-gold" onclick="saveSubscription()">💾 حفظ الاشتراك</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-appt">
+  <div class="modal">
+    <h2 id="appt-modal-title">📅 حجز موعد</h2>
+    <input type="hidden" id="appt-edit-id">
+    <div class="form-group">
+      <label>العضو *</label>
+      <select class="form-control" id="appt-member" onchange="updateApptCredits()"></select>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>التاريخ *</label>
+        <input class="form-control" id="appt-date" type="date" onchange="updateApptCredits()">
+      </div>
+      <div class="form-group">
+        <label>الوقت *</label>
+        <select class="form-control" id="appt-time" onchange="updateApptCredits()">
+          <option value="06:00">6:00 ص ⚡Peak</option>
+          <option value="07:00">7:00 ص ⚡Peak</option>
+          <option value="08:00">8:00 ص ⚡Peak</option>
+          <option value="09:00">9:00 ص ⚡Peak</option>
+          <option value="11:00">11:00 ص Off-Peak</option>
+          <option value="12:00">12:00 م Off-Peak</option>
+          <option value="13:00">1:00 م Off-Peak</option>
+          <option value="14:00">2:00 م Off-Peak</option>
+          <option value="15:00">3:00 م Off-Peak</option>
+          <option value="16:30">4:30 م ⚡Peak</option>
+          <option value="17:30">5:30 م ⚡Peak</option>
+          <option value="18:30">6:30 م ⚡Peak</option>
+          <option value="19:30">7:30 م ⚡Peak</option>
+          <option value="20:00">8:00 م ⚡Peak</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>نوع التمرين</label>
+      <select class="form-control" id="appt-workout">
+        <option>تدريب عام</option>
+        <option>Strength Training</option>
+        <option>Cardio</option>
+        <option>HIIT</option>
+        <option>تمارين مرونة</option>
+        <option>تخطيط غذائي</option>
+      </select>
+    </div>
+    <div id="appt-credit-info" class="alert alert-warning" style="display:none"></div>
+    <div class="form-group">
+      <label>ملاحظات</label>
+      <input class="form-control" id="appt-notes" placeholder="أي ملاحظات...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-appt')">إلغاء</button>
+      <button class="btn btn-gold" onclick="saveAppointment()">💾 تأكيد الموعد</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-sell-session">
+  <div class="modal">
+    <h2>💪 بيع حصص تدريبية</h2>
+    <div class="form-group">
+      <label>العضو *</label>
+      <select class="form-control" id="sess-member"></select>
+    </div>
+    <div class="form-group">
+      <label>الباقة *</label>
+      <select class="form-control" id="sess-package" onchange="updateSessPrice()"></select>
+    </div>
+    <div id="sess-price-info" class="alert alert-warning" style="margin-top:0"></div>
+    <div class="form-group">
+      <label>طريقة الدفع</label>
+      <select class="form-control" id="sess-payment">
+        <option>كاش</option>
+        <option>كليك</option>
+        <option>تحويل بنكي</option>
+        <option>بطاقة ائتمان</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-sell-session')">إلغاء</button>
+      <button class="btn btn-gold" onclick="saveSellSession()">💾 تأكيد البيع</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-member-detail">
+  <div class="modal" style="width:580px">
+    <h2 id="detail-name">👤 تفاصيل العضو</h2>
+    <div class="detail-grid" id="detail-info" style="margin-bottom:16px"></div>
+    <div class="section-title" style="margin-bottom:10px">الاشتراكات</div>
+    <div id="detail-subs" style="margin-bottom:16px"></div>
+    <div class="section-title" style="margin-bottom:10px">الحصص المباعة</div>
+    <div id="detail-sessions" style="margin-bottom:16px"></div>
+    <div class="section-title" style="margin-bottom:10px">آخر المواعيد</div>
+    <div id="detail-appts"></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="btn-delete-member-trigger" style="margin-left: auto;">حذف العضو</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-member-detail')">إغلاق</button>
+      <button class="btn btn-gold" id="btn-edit-member-trigger">✏️ تعديل بيانات العضو</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-edit-prices">
+  <div class="modal" style="width: 550px;">
+    <h2>⚙️ تعديل أسعار وقيم الباقات</h2>
+    
+    <h3 style="margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">🎯 الاشتراكات الشهرية</h3>
+    <div class="grid-2">
+      <div class="form-group"><label>Starter Rhythm (JD)</label><input type="number" class="form-control" id="pr-sub-starter"></div>
+      <div class="form-group"><label>Core Momentum (JD)</label><input type="number" class="form-control" id="pr-sub-core"></div>
+      <div class="form-group"><label>The Dedicated (JD)</label><input type="number" class="form-control" id="pr-sub-dedicated"></div>
+      <div class="form-group"><label>Elite Private (JD)</label><input type="number" class="form-control" id="pr-sub-elite"></div>
+    </div>
+
+    <h3 style="margin-top: 10px; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">💪 باقات الحصص المباعة</h3>
+    <div class="grid-3">
+      <div class="form-group"><label>1 حصة</label><input type="number" class="form-control" id="pr-p1"></div>
+      <div class="form-group"><label>5 حصص</label><input type="number" class="form-control" id="pr-p5"></div>
+      <div class="form-group"><label>10 حصص</label><input type="number" class="form-control" id="pr-p10"></div>
+      <div class="form-group"><label>25 حصة</label><input type="number" class="form-control" id="pr-p25"></div>
+      <div class="form-group"><label>50 حصة</label><input type="number" class="form-control" id="pr-p50"></div>
+      <div class="form-group"><label>100 حصة</label><input type="number" class="form-control" id="pr-p100"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-edit-prices')">إلغاء</button>
+      <button class="btn btn-gold" onclick="savePricesConfig()">💾 حفظ وتحديث الأسعار</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ DATA STORE ============
+let db = {
+  members: [],
+  subscriptions: [],
+  appointments: [],
+  sessions: [],
+  activity: [],
+  prices: {
+    // Subscriptions prices
+    starter: 95, core: 165, dedicated: 225, elite: 270,
+    // Pay as you go packages prices
+    p1: 30, p5: 140, p10: 260, p25: 550, p50: 1000, p100: 1800
+  }
+};
+
+// Default Static mapping structure for configurations
+const SUB_TYPES_META = {
+  starter: { name: 'مسار البداية (Starter Rhythm)', credits: 4 },
+  core:    { name: 'زخم الانطلاق (Core Momentum)', credits: 8 },
+  dedicated: { name: 'عزيمة الإلتزام (The Dedicated)', credits: 12 },
+  elite:   { name: 'وتيرة النخبة (Elite Private)', credits: 16 }
+};
+
+// Try load from localStorage
+try {
+  const saved = localStorage.getItem('conceptplus_db');
+  if (saved) {
+    db = JSON.parse(saved);
+    if (!db.prices) db.prices = { starter: 95, core: 165, dedicated: 225, elite: 270, p1: 30, p5: 140, p10: 260, p25: 550, p50: 1000, p100: 1800 };
+  }
+} catch(e) {}
+
+function save() {
+  try { localStorage.setItem('conceptplus_db', JSON.stringify(db)); } catch(e) {}
+}
+
+// Dynamically fetch configurations values based on edited settings
+function getSubTypesConfig() {
+  return {
+    starter: { name: SUB_TYPES_META.starter.name, price: db.prices.starter, credits: SUB_TYPES_META.starter.credits },
+    core:    { name: SUB_TYPES_META.core.name, price: db.prices.core, credits: SUB_TYPES_META.core.credits },
+    dedicated: { name: SUB_TYPES_META.dedicated.name, price: db.prices.dedicated, credits: SUB_TYPES_META.dedicated.credits },
+    elite:   { name: SUB_TYPES_META.elite.name, price: db.prices.elite, credits: SUB_TYPES_META.elite.credits }
+  };
+}
+
+// ============ NAV ============
+function showPage(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  const pageTarget = document.getElementById('page-' + page);
+  if(pageTarget) pageTarget.classList.add('active');
+  if(el) el.classList.add('active');
+  
+  const titles = {
+    dashboard: 'لوحة التحكم', members: 'الأعضاء', subscriptions: 'الاشتراكات',
+    appointments: 'المواعيد', sessions: 'الحصص المباعة', prices: 'قائمة الأسعار', reports: 'التقارير', export: 'استخراج البيانات'
+  };
+  document.getElementById('page-title').textContent = titles[page] || page;
+  
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'members') renderMembers();
+  if (page === 'subscriptions') renderSubscriptions('all');
+  if (page === 'appointments') renderCalendar();
+  if (page === 'sessions') renderSessions();
+  if (page === 'prices') renderPricesPage();
+  if (page === 'reports') renderReports();
+}
+
+// ============ DATE ============
+function today() { return new Date().toISOString().split('T')[0]; }
+function formatDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+// ============ TOAST ============
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ============ MODAL ============
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ============ MEMBER ACTIONS ============
+function openAddMember() {
+  document.getElementById('member-modal-title').textContent = "👤 إضافة عضو جديد";
+  document.getElementById('m-edit-id').value = '';
+  ['m-name','m-phone','m-email','m-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('m-dob').value = '';
+  openModal('modal-add-member');
+}
+
+function openEditMember(id) {
+  const m = db.members.find(x => x.id === id);
+  if (!m) return;
+  closeModal('modal-member-detail');
+  
+  document.getElementById('member-modal-title').textContent = "✏️ تعديل بيانات العضو";
+  document.getElementById('m-edit-id').value = m.id;
+  document.getElementById('m-name').value = m.name || '';
+  document.getElementById('m-phone').value = m.phone || '';
+  document.getElementById('m-email').value = m.email || '';
+  document.getElementById('m-dob').value = m.dob || '';
+  document.getElementById('m-gender').value = m.gender || 'ذكر';
+  document.getElementById('m-notes').value = m.notes || '';
+  openModal('modal-add-member');
+}
+
+function saveMember() {
+  const name = document.getElementById('m-name').value.trim();
+  const editId = document.getElementById('m-edit-id').value;
+  if (!name) { showToast('⚠️ الرجاء إدخال اسم العضو'); return; }
+  
+  if (editId) {
+    // Update Mode
+    const index = db.members.findIndex(m => m.id === editId);
+    if (index !== -1) {
+      db.members[index].name = name;
+      db.members[index].phone = document.getElementById('m-phone').value.trim();
+      db.members[index].email = document.getElementById('m-email').value.trim();
+      db.members[index].dob = document.getElementById('m-dob').value;
+      db.members[index].gender = document.getElementById('m-gender').value;
+      db.members[index].notes = document.getElementById('m-notes').value.trim();
+    }
+    db.activity.unshift({ date: today(), text: `تم تحديث بيانات العضو: ${name}` });
+    showToast(`✅ تم تحديث بيانات ${name}`);
+    save();
+    closeModal('modal-add-member');
+    renderMembers();
+    renderDashboard();
+  } else {
+    // Creation Mode
+    const newId = Date.now().toString();
+    const member = {
+      id: newId,
+      name,
+      phone: document.getElementById('m-phone').value.trim(),
+      email: document.getElementById('m-email').value.trim(),
+      dob: document.getElementById('m-dob').value,
+      gender: document.getElementById('m-gender').value,
+      notes: document.getElementById('m-notes').value.trim(),
+      createdAt: today()
+    };
+    db.members.push(member);
+    db.activity.unshift({ date: today(), text: `تم إضافة عضو جديد: ${name}` });
+    save();
+    closeModal('modal-add-member');
+    renderMembers();
+    renderDashboard();
+    
+    // Trigger Interactive Prompt Flow
+    document.getElementById('post-member-id').value = newId;
+    openModal('modal-post-member');
+  }
+}
+
+function triggerPostAction(actionType) {
+  const memberId = document.getElementById('post-member-id').value;
+  closeModal('modal-post-member');
+  if (actionType === 'sub') {
+    openAddSubscriptionWithMember(memberId);
+  } else if (actionType === 'appt') {
+    openAddAppointmentWithMember(memberId);
+  }
+}
+
+function deleteMember(id) {
+  if (!confirm('هل أنت متأكد تماماً من حذف هذا العضو؟ سيتم إزالة كافة السجلات المرتبطة به.')) return;
+  db.members = db.members.filter(m => m.id !== id);
+  db.subscriptions = db.subscriptions.filter(s => s.memberId !== id);
+  db.appointments = db.appointments.filter(a => a.memberId !== id);
+  db.sessions = db.sessions.filter(s => s.memberId !== id);
+  db.activity.unshift({ date: today(), text: `تم حذف العضو وسجلاته برقم معرّف: ${id}` });
+  save();
+  closeModal('modal-member-detail');
+  renderMembers();
+  renderDashboard();
+  showToast('🗑️ تم حذف العضو وكافة بياناته');
+}
+
+function renderMembers() {
+  const q = (document.getElementById('member-search')?.value || '').toLowerCase();
+  const list = document.getElementById('members-list');
+  if (!list) return;
+  let filtered = db.members.filter(m =>
+    m.name.toLowerCase().includes(q) || (m.phone || '').includes(q)
+  );
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><p>لا يوجد أعضاء مسجلين مطابقين للبحث</p></div>`;
+    return;
+  }
+  const currentSubTypes = getSubTypesConfig();
+  list.innerHTML = filtered.map(m => {
+    const activeSub = getActiveSub(m.id);
+    const credits = activeSub ? activeSub.creditsLeft : null;
+    const totalCredits = activeSub ? (currentSubTypes[activeSub.type]?.credits || 1) : 1;
+    const pct = credits != null ? Math.min(100, Math.round((credits / totalCredits) * 100)) : 0;
+    const subLabel = activeSub ? currentSubTypes[activeSub.type]?.name : 'لا يوجد اشتراك نشط';
+    const badge = activeSub
+      ? `<span class="badge badge-green">نشط</span>`
+      : `<span class="badge badge-muted">غير مشترك</span>`;
+    return `
+    <div class="member-card">
+      <div class="member-info" onclick="showMemberDetail('${m.id}')">
+        <div class="avatar">${m.name.charAt(0)}</div>
+        <div>
+          <div class="member-name">${m.name}</div>
+          <div class="member-sub">${m.phone || 'لا يوجد هاتف'} • ${subLabel}</div>
+          ${credits != null ? `
+            <div class="credit-bar-wrap" style="margin-top:5px">
+              <div style="font-size:14px;color:var(--muted);margin-bottom:3px">${credits} نقطة متبقية</div>
+              <div class="credit-bar-track" style="width:160px">
+                <div class="credit-bar-fill" style="width:${pct}%"></div>
+              </div>
+            </div>` : ''}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        ${badge}
+        <div style="display:flex; gap:5px;">
+           <button class="btn btn-sm btn-outline" onclick="openEditMember('${m.id}')">✏️ تعديل</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getActiveSub(memberId) {
+  const t = today();
+  return db.subscriptions.find(s => s.memberId === memberId && s.endDate >= t) || null;
+}
+
+function showMemberDetail(id) {
+  const m = db.members.find(x => x.id === id);
+  if (!m) return;
+  const currentSubTypes = getSubTypesConfig();
+  document.getElementById('detail-name').textContent = `👤 ${m.name}`;
+  document.getElementById('detail-info').innerHTML = `
+    <div class="detail-item"><label>رقم الهاتف</label><span>${m.phone || '—'}</span></div>
+    <div class="detail-item"><label>البريد الإلكتروني</label><span>${m.email || '—'}</span></div>
+    <div class="detail-item"><label>الجنس</label><span>${m.gender || '—'}</span></div>
+    <div class="detail-item"><label>تاريخ التسجيل</label><span>${formatDate(m.createdAt)}</span></div>
+    ${m.notes ? `<div class="detail-item" style="grid-column:1/-1"><label>ملاحظات</label><span>${m.notes}</span></div>` : ''}
+  `;
+  
+  // Set trigger behaviors dynamic buttons
+  document.getElementById('btn-edit-member-trigger').onclick = function() { openEditMember(m.id); };
+  document.getElementById('btn-delete-member-trigger').onclick = function() { deleteMember(m.id); };
+
+  const subs = db.subscriptions.filter(s => s.memberId === id);
+  document.getElementById('detail-subs').innerHTML = subs.length
+    ? subs.map(s => `<div class="appt-card">
+        <div><div class="appt-time">${currentSubTypes[s.type]?.name || s.type}</div>
+        <div class="appt-type">${formatDate(s.startDate)} – ${formatDate(s.endDate)}</div></div>
+        <div><span class="badge ${s.endDate >= today() ? 'badge-green' : 'badge-red'}">${s.endDate >= today() ? 'نشط' : 'منتهي'}</span>
+        <div style="font-size:16px;color:var(--gold);margin-top:4px">${s.creditsLeft} نقطة متبقية</div></div>
+      </div>`).join('')
+    : '<div style="color:var(--muted);font-size:17px">لا يوجد اشتراكات مسجلة</div>';
+
+  const sess = db.sessions.filter(s => s.memberId === id);
+  document.getElementById('detail-sessions').innerHTML = sess.length
+    ? sess.map(s => `<div class="appt-card">
+        <div><div class="appt-time">${s.total} حصة</div>
+        <div class="appt-type">${formatDate(s.date)} • ${s.payment}</div></div>
+        <div><div style="font-size:24px;font-weight:900;color:var(--gold)">${s.remaining}</div>
+        <div style="font-size:15px;color:var(--muted)">متبقية</div></div>
+      </div>`).join('')
+    : '<div style="color:var(--muted);font-size:17px">لا يوجد حصص مباعة لهذا العضو</div>';
+
+  const appts = db.appointments.filter(a => a.memberId === id).slice(-5).reverse();
+  document.getElementById('detail-appts').innerHTML = appts.length
+    ? appts.map(a => `<div class="appt-card">
+        <div><div class="appt-time">${a.time}</div>
+        <div class="appt-type">${formatDate(a.date)} • ${a.workout}</div></div>
+        <span class="badge badge-blue">${a.peakType === 'peak' ? '⚡ Peak' : 'Off-Peak'}</span>
+      </div>`).join('')
+    : '<div style="color:var(--muted);font-size:17px">لا يوجد مواعيد سابقة</div>';
+  openModal('modal-member-detail');
+}
+
+// ============ SUBSCRIPTION ACTIONS ============
+function openAddSubscription() {
+  document.getElementById('sub-modal-title').textContent = "📋 إضافة اشتراك شهري";
+  document.getElementById('sub-edit-id').value = '';
+  document.getElementById('sub-edit-credits-group').style.display = "none";
+  closeModal('modal-member-detail');
+  
+  const sel = document.getElementById('sub-member');
+  sel.innerHTML = db.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  document.getElementById('sub-type').value = '';
+  document.getElementById('sub-start').value = today();
+  document.getElementById('sub-end').value = '';
+  document.getElementById('sub-preview').style.display = 'none';
+  openModal('modal-add-sub');
+}
+
+function openAddSubscriptionWithMember(memberId) {
+  openAddSubscription();
+  document.getElementById('sub-member').value = memberId;
+}
+
+function openEditSubscription(id) {
+  const sub = db.subscriptions.find(s => s.id === id);
+  if (!sub) return;
+  
+  document.getElementById('sub-modal-title').textContent = "✏️ تعديل الاشتراك الشهري";
+  document.getElementById('sub-edit-id').value = sub.id;
+  
+  const sel = document.getElementById('sub-member');
+  sel.innerHTML = db.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  sel.value = sub.memberId;
+  
+  document.getElementById('sub-type').value = sub.type;
+  document.getElementById('sub-start').value = sub.startDate;
+  document.getElementById('sub-end').value = sub.endDate;
+  
+  // Expose current fields for manual tweaks
+  document.getElementById('sub-edit-credits-group').style.display = "block";
+  document.getElementById('sub-credits-left').value = sub.creditsLeft;
+  
+  updateSubDetails();
+  openModal('modal-add-sub');
+}
+
+function updateSubDetails() {
+  const type = document.getElementById('sub-type').value;
+  const start = document.getElementById('sub-start').value;
+  if (!type || !start) return;
+  
+  const end = new Date(start);
+  end.setMonth(end.getMonth() + 1);
+  const endStr = end.toISOString().split('T')[0];
+  document.getElementById('sub-end').value = endStr;
+  
+  const currentSubTypes = getSubTypesConfig();
+  const t = currentSubTypes[type];
+  const prev = document.getElementById('sub-preview');
+  prev.style.display = 'block';
+  prev.textContent = `✅ الباقة المختارة: ${t.name} • السعر: ${t.price} JD • الرصيد الافتراضي: ${t.credits} نقطة`;
+}
+
+function saveSubscription() {
+  const memberId = document.getElementById('sub-member').value;
+  const type = document.getElementById('sub-type').value;
+  const startDate = document.getElementById('sub-start').value;
+  const endDate = document.getElementById('sub-end').value;
+  const editId = document.getElementById('sub-edit-id').value;
+  
+  if (!memberId || !type || !startDate) { showToast('⚠️ الرجاء تعبئة جميع الحقول الأساسية'); return; }
+  
+  const currentSubTypes = getSubTypesConfig();
+  const t = currentSubTypes[type];
+  const member = db.members.find(m => m.id === memberId);
+  
+  if (editId) {
+    // Update existing subscription
+    const idx = db.subscriptions.findIndex(s => s.id === editId);
+    if(idx !== -1) {
+      db.subscriptions[idx].memberId = memberId;
+      db.subscriptions[idx].type = type;
+      db.subscriptions[idx].startDate = startDate;
+      db.subscriptions[idx].endDate = endDate;
+      db.subscriptions[idx].creditsLeft = parseFloat(document.getElementById('sub-credits-left').value) || 0;
+    }
+    db.activity.unshift({ date: today(), text: `تعديل اشتراك: لـ ${member?.name}` });
+    showToast(`✅ تم تعديل الاشتراك بنجاح`);
+  } else {
+    // New subscription
+    const sub = {
+      id: Date.now().toString(),
+      memberId, type, startDate,
+      endDate: endDate || (() => { const d=new Date(startDate); d.setMonth(d.getMonth()+1); return d.toISOString().split('T')[0]; })(),
+      creditsLeft: t.credits,
+      totalCredits: t.credits,
+      price: t.price,
+      createdAt: today()
+    };
+    db.subscriptions.push(sub);
+    db.activity.unshift({ date: today(), text: `اشتراك جديد: ${member?.name} – ${t.name}` });
+    showToast(`✅ تم تسجيل اشتراك ${t.name} لـ ${member?.name}`);
+  }
+  
+  save();
+  closeModal('modal-add-sub');
+  renderSubscriptions('all');
+  renderDashboard();
+}
+
+function filterSubs(filter, el) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderSubscriptions(filter);
+}
+
+function renderSubscriptions(filter = 'all') {
+  const t = today();
+  let subs = db.subscriptions;
+  if (filter === 'active') subs = subs.filter(s => s.endDate >= t);
+  if (filter === 'expired') subs = subs.filter(s => s.endDate < t);
+  
+  const tbody = document.getElementById('subs-table');
+  if (!tbody) return;
+  if (!subs.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><div class="empty-icon">📋</div><p>لا توجد اشتراكات مسجلة حالياً</p></td></tr>`;
+    return;
+  }
+  
+  const currentSubTypes = getSubTypesConfig();
+  tbody.innerHTML = subs.map(s => {
+    const m = db.members.find(x => x.id === s.memberId);
+    const active = s.endDate >= t;
+    const pct = Math.round((s.creditsLeft / (s.totalCredits || 1)) * 100);
+    return `<tr>
+      <td><strong>${m?.name || '—'}</strong></td>
+      <td>${currentSubTypes[s.type]?.name || s.type}</td>
+      <td>${formatDate(s.startDate)}</td>
+      <td>${formatDate(s.endDate)}</td>
+      <td>
+        <span style="color:var(--gold);font-weight:700">${s.creditsLeft}</span>
+        <span style="color:var(--muted)"> / ${s.totalCredits}</span>
+        <div class="credit-bar-track" style="width:80px;margin-top:4px">
+          <div class="credit-bar-fill" style="width:${pct}%"></div>
+        </div>
+      </td>
+      <td><span class="badge ${active ? 'badge-green' : 'badge-red'}">${active ? 'نشط' : 'منتهي'}</span></td>
+      <td>
+        <button class="btn btn-sm btn-outline" style="margin-right:2px" onclick="openEditSubscription('${s.id}')">✏️ تعديل</button>
+        ${active ? `<button class="btn btn-sm btn-outline" style="border-color:#50C878; color:#3cb362" onclick="renewSub('${s.id}')">تجديد</button>` : ''}
+        <button class="btn btn-sm btn-danger" style="margin-right:2px" onclick="deleteSub('${s.id}')">حذف</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renewSub(id) {
+  const sub = db.subscriptions.find(s => s.id === id);
+  if (!sub) return;
+  const currentSubTypes = getSubTypesConfig();
+  const t = currentSubTypes[sub.type];
+  const newStart = sub.endDate > today() ? sub.endDate : today();
+  const newEnd = new Date(newStart);
+  newEnd.setMonth(newEnd.getMonth() + 1);
+  const newSub = {
+    ...sub,
+    id: Date.now().toString(),
+    startDate: newStart,
+    endDate: newEnd.toISOString().split('T')[0],
+    creditsLeft: t.credits,
+    totalCredits: t.credits,
+    createdAt: today()
+  };
+  db.subscriptions.push(newSub);
+  const m = db.members.find(x => x.id === sub.memberId);
+  db.activity.unshift({ date: today(), text: `تجديد اشتراك تلقائي: ${m?.name} – ${t.name}` });
+  save();
+  renderSubscriptions('all');
+  showToast('✅ تم تجديد وإدراج الاشتراك للفترة القادمة');
+}
+
+function deleteSub(id) {
+  if (!confirm('هل أنت متأكد من حذف هذا الاشتراك؟')) return;
+  db.subscriptions = db.subscriptions.filter(s => s.id !== id);
+  save();
+  renderSubscriptions('all');
+  showToast('🗑️ تم حذف القيد بنجاح');
+}
+
+// ============ APPOINTMENTS ACTIONS ============
+let calYear, calMonth, selectedDay;
+
+function initCal() {
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+  selectedDay = now.toISOString().split('T')[0];
+}
+
+function renderCalendar() {
+  if (!calYear) initCal();
+  const monthNames = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  document.getElementById('cal-month-label').textContent = `${monthNames[calMonth]} ${calYear}`;
+
+  const headers = document.getElementById('cal-headers');
+  const days = ['أحد','اثن','ثلا','أرب','خمي','جمع','سبت'];
+  headers.innerHTML = days.map(d => `<div class="cal-day-header">${d}</div>`).join('');
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const t = today();
+
+  let html = Array(firstDay).fill(`<div class="cal-day empty"></div>`).join('');
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasAppt = db.appointments.some(a => a.date === dateStr);
+    const cls = [
+      'cal-day',
+      dateStr === t ? 'today' : '',
+      dateStr === selectedDay ? 'selected' : '',
+      hasAppt ? 'has-appt' : ''
+    ].filter(Boolean).join(' ');
+    html += `<div class="${cls}" onclick="selectDay('${dateStr}')">${d}</div>`;
+  }
+  document.getElementById('cal-days').innerHTML = html;
+  renderDayAppointments();
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+
+function selectDay(dateStr) {
+  selectedDay = dateStr;
+  renderCalendar();
+}
+
+function renderDayAppointments() {
+  const appts = db.appointments.filter(a => a.date === selectedDay);
+  const title = document.getElementById('appt-day-title');
+  if (title) title.textContent = `مواعيد يوم ${formatDate(selectedDay)}`;
+  const list = document.getElementById('appt-day-list');
+  if (!list) return;
+  if (!appts.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div><p>لا توجد مواعيد مجدولة لهذا اليوم</p></div>`;
+    return;
+  }
+  appts.sort((a,b) => a.time.localeCompare(b.time));
+  list.innerHTML = appts.map(a => {
+    const m = db.members.find(x => x.id === a.memberId);
+    return `<div class="appt-card">
+      <div>
+        <div class="appt-time">${a.time}</div>
+        <div style="font-weight:700;font-size:18px;margin-top:2px">${m?.name || '—'}</div>
+        <div class="appt-type">${a.workout}</div>
+        ${a.notes ? `<div style="font-size:15px;color:var(--muted)">${a.notes}</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <span class="badge ${a.peakType==='peak'?'badge-gold':'badge-blue'}">${a.peakType==='peak'?'⚡ Peak':'Off-Peak'}</span>
+        <span style="font-size:15px;color:var(--muted)">${a.creditCost} نقطة</span>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-sm btn-outline" onclick="openEditAppointment('${a.id}')">✏️ تعديل</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteAppt('${a.id}')">إلغاء</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openAddAppointment() {
+  document.getElementById('appt-modal-title').textContent = "📅 حجز موعد جديد";
+  document.getElementById('appt-edit-id').value = '';
+  
+  const sel = document.getElementById('appt-member');
+  sel.innerHTML = db.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  document.getElementById('appt-date').value = selectedDay || today();
+  document.getElementById('appt-notes').value = '';
+  document.getElementById('appt-credit-info').style.display = 'none';
+  openModal('modal-add-appt');
+  updateApptCredits();
+}
+
+function openAddAppointmentWithMember(memberId) {
+  openAddAppointment();
+  document.getElementById('appt-member').value = memberId;
+  updateApptCredits();
+}
+
+function openEditAppointment(id) {
+  const appt = db.appointments.find(a => a.id === id);
+  if (!appt) return;
+  
+  document.getElementById('appt-modal-title').textContent = "✏️ تعديل بيانات الموعد";
+  document.getElementById('appt-edit-id').value = appt.id;
+  
+  const sel = document.getElementById('appt-member');
+  sel.innerHTML = db.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  sel.value = appt.memberId;
+  
+  document.getElementById('appt-date').value = appt.date;
+  document.getElementById('appt-time').value = appt.time;
+  document.getElementById('appt-workout').value = appt.workout;
+  document.getElementById('appt-notes').value = appt.notes || '';
+  
+  openModal('modal-add-appt');
+  updateApptCredits();
+}
+
+function isPeak(time) {
+  const h = parseInt(time.split(':')[0]);
+  const m = parseInt(time.split(':')[1]);
+  const mins = h*60+m;
+  return (mins >= 360 && mins < 570) || (mins >= 990 && mins <= 1230);
+}
+
+function updateApptCredits() {
+  const memberId = document.getElementById('appt-member')?.value;
+  const time = document.getElementById('appt-time')?.value;
+  if (!memberId || !time) return;
+  const peak = isPeak(time);
+  const cost = peak ? 1.5 : 1;
+  const sub = getActiveSub(memberId);
+  const info = document.getElementById('appt-credit-info');
+  if (sub) {
+    info.style.display = 'block';
+    const warn = sub.creditsLeft < cost;
+    info.className = `alert ${warn ? 'alert-danger' : 'alert-warning'}`;
+    info.textContent = `${peak ? '⚡ توقيت ذروة Peak' : '⚪ توقيت عادي Off-Peak'} • تكلفة الخصم: ${cost} نقطة • المتبقي الحالي في بطاقة المشترك: ${sub.creditsLeft} نقطة`;
+  } else {
+    info.style.display = 'block';
+    info.className = 'alert alert-danger';
+    info.textContent = '⚠️ تنبيه: لا يوجد اشتراك شهري نشط وصالح لهذا العضو حالياً!';
+  }
+}
+
+function saveAppointment() {
+  const memberId = document.getElementById('appt-member').value;
+  const date = document.getElementById('appt-date').value;
+  const time = document.getElementById('appt-time').value;
+  const editId = document.getElementById('appt-edit-id').value;
+  
+  if (!memberId || !date || !time) { showToast('⚠️ الرجاء تعبئة جميع الحقول'); return; }
+  const peak = isPeak(time);
+  const cost = peak ? 1.5 : 1;
+  const m = db.members.find(x => x.id === memberId);
+  
+  if (editId) {
+    // Reverse previous appt allocation credit first before re-checking
+    const oldAppt = db.appointments.find(a => a.id === editId);
+    if(oldAppt) {
+       const prevSub = getActiveSub(oldAppt.memberId);
+       if (prevSub) prevSub.creditsLeft += oldAppt.creditCost; // temporary reverse
+    }
+    
+    const sub = getActiveSub(memberId);
+    if (sub) {
+      if (sub.creditsLeft < cost) { 
+         showToast('❌ الرصيد غير كافٍ الموعد الجديد');
+         if(oldAppt && getActiveSub(oldAppt.memberId)) getActiveSub(oldAppt.memberId).creditsLeft -= oldAppt.creditCost; // rollback reverse
+         return; 
+      }
+      sub.creditsLeft -= cost;
+    }
+    
+    // Update target parameters
+    const idx = db.appointments.findIndex(a => a.id === editId);
+    if (idx !== -1) {
+      db.appointments[idx].memberId = memberId;
+      db.appointments[idx].date = date;
+      db.appointments[idx].time = time;
+      db.appointments[idx].workout = document.getElementById('appt-workout').value;
+      db.appointments[idx].notes = document.getElementById('appt-notes').value;
+      db.appointments[idx].peakType = peak ? 'peak' : 'offpeak';
+      db.appointments[idx].creditCost = cost;
+    }
+    db.activity.unshift({ date: today(), text: `تعديل جدول الموعد: لـ ${m?.name}` });
+    showToast(`✅ تم تعديل وحفظ بيانات الموعد`);
+  } else {
+    // Standard creation route logic
+    const sub = getActiveSub(memberId);
+    if (sub) {
+      if (sub.creditsLeft < cost) { showToast('❌ نقاط رصيد المشترك غير كافية لإتمام الحجز'); return; }
+      sub.creditsLeft -= cost;
+    }
+    const appt = {
+      id: Date.now().toString(),
+      memberId, date, time,
+      workout: document.getElementById('appt-workout').value,
+      notes: document.getElementById('appt-notes').value,
+      peakType: peak ? 'peak' : 'offpeak',
+      creditCost: cost,
+      createdAt: today()
+    };
+    db.appointments.push(appt);
+    db.activity.unshift({ date: today(), text: `موعد حجز جديد: ${m?.name} – ${date} ${time}` });
+    showToast(`✅ تم حجز وتأكيد الموعد بنجاح لـ ${m?.name}`);
+  }
+  
+  save();
+  closeModal('modal-add-appt');
+  renderCalendar();
+  renderDashboard();
+}
+
+function deleteAppt(id) {
+  if(!confirm('هل تود إلغاء الموعد المختار؟')) return;
+  const appt = db.appointments.find(a => a.id === id);
+  if (appt) {
+    const sub = getActiveSub(appt.memberId);
+    if (sub) sub.creditsLeft += appt.creditCost;
+  }
+  db.appointments = db.appointments.filter(a => a.id !== id);
+  save();
+  renderCalendar();
+  renderDashboard();
+  showToast('✅ تم إلغاء الموعد وإرجاع النقاط المستقطعة للمشترك تلقائياً');
+}
+
+// ============ SESSIONS (PAY AS YOU GO) ACTIONS ============
+function openSellSession() {
+  const sel = document.getElementById('sess-member');
+  sel.innerHTML = db.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  renderSessPackagesDropdown();
+  updateSessPrice();
+  openModal('modal-sell-session');
+}
+
+function renderSessPackagesDropdown() {
+  const drop = document.getElementById('sess-package');
+  if(!drop) return;
+  drop.innerHTML = `
+    <option value="1|${db.prices.p1}">1 حصة – ${db.prices.p1} JD</option>
+    <option value="5|${db.prices.p5}">5 حصص – ${db.prices.p5} JD</option>
+    <option value="10|${db.prices.p10}">10 حصص – ${db.prices.p10} JD</option>
+    <option value="25|${db.prices.p25}">25 حصة – ${db.prices.p25} JD</option>
+    <option value="50|${db.prices.p50}">50 حصة – ${db.prices.p50} JD</option>
+    <option value="100|${db.prices.p100}">100 حصة – ${db.prices.p100} JD</option>
+  `;
+}
+
+function updateSessPrice() {
+  const pkg = document.getElementById('sess-package')?.value || '';
+  const [total, price] = pkg.split('|');
+  const info = document.getElementById('sess-price-info');
+  if (info) info.textContent = `💰 القيمة الإجمالية المطلوبة: ${price} JD لعدد (${total}) حصص تدريبية`;
+}
+
+function saveSellSession() {
+  const memberId = document.getElementById('sess-member').value;
+  const pkg = document.getElementById('sess-package').value;
+  if(!memberId || !pkg) return;
+  const [total, price] = pkg.split('|');
+  const payment = document.getElementById('sess-payment').value;
+  const m = db.members.find(x => x.id === memberId);
+  const sess = {
+    id: Date.now().toString(),
+    memberId,
+    total: parseInt(total),
+    remaining: parseInt(total),
+    price: parseInt(price),
+    payment,
+    date: today()
+  };
+  db.sessions.push(sess);
+  db.activity.unshift({ date: today(), text: `مبيعات باقة حصص: ${total} حصة لـ ${m?.name} بمبلغ ${price} JD` });
+  save();
+  closeModal('modal-sell-session');
+  renderSessions();
+  renderDashboard();
+  showToast(`✅ تم تسجيل عملية البيع وتفعيل رصيد الحصص لـ ${m?.name}`);
+}
+
+function renderSessions() {
+  const tbody = document.getElementById('sessions-table');
+  if (!tbody) return;
+  if (!db.sessions.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="empty-state"><div class="empty-icon">💪</div><p>لا توجد مبيعات حصص مسجلة</p></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = db.sessions.slice().reverse().map(s => {
+    const m = db.members.find(x => x.id === s.memberId);
+    const pct = Math.round((s.remaining / s.total) * 100);
+    return `<tr>
+      <td><strong>${m?.name||'—'}</strong></td>
+      <td>${s.total} حصة</td>
+      <td>${s.total}</td>
+      <td>${s.total - s.remaining}</td>
+      <td>
+        <span style="color:var(--gold);font-weight:700">${s.remaining}</span>
+        <div class="credit-bar-track" style="width:60px;margin-top:4px">
+          <div class="credit-bar-fill" style="width:${pct}%"></div>
+        </div>
+      </td>
+      <td style="color:var(--gold);font-weight:700">${s.price}</td>
+      <td>${formatDate(s.date)}</td>
+      <td>
+        ${s.remaining > 0 ? `<button class="btn btn-sm btn-outline" onclick="useSession('${s.id}')">استهلاك حصة ⚡</button>` : '<span class="badge badge-muted">مكتملة بالكامل</span>'}
+        <button class="btn btn-sm btn-danger" style="margin-right:2px;" onclick="deleteSessionSale('${s.id}')">حذف</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function useSession(id) {
+  const sess = db.sessions.find(s => s.id === id);
+  if (!sess || sess.remaining <= 0) return;
+  sess.remaining--;
+  save();
+  renderSessions();
+  renderDashboard();
+  showToast('✅ تم تسجيل استهلاك حصة تدريبية بنجاح من رصيد العضو');
+}
+
+function deleteSessionSale(id) {
+  if(!confirm('هل تود حذف قيد المبيعات هذا نهائياً من النظام؟')) return;
+  db.sessions = db.sessions.filter(s => s.id !== id);
+  save();
+  renderSessions();
+  renderDashboard();
+  showToast('🗑️ تم حذف القيد والمبيعات المرتبطة به');
+}
+
+// ============ DYNAMIC PRICES ACTIONS (EDIT PRICE LIST) ============
+function renderPricesPage() {
+  // Render subscriptions rates section markup UI
+  const tierContainer = document.getElementById('prices-tier-container');
+  tierContainer.innerHTML = `
+    <div class="price-row"><div><div class="price-name">مسار البداية (Starter Rhythm)</div><div class="price-save">1x أسبوعي • 4 نقاط/شهر</div></div>
+      <div style="text-align:center"><div class="price-val">${db.prices.starter}</div><div class="price-jd">JD / شهر</div></div></div>
+    <div class="price-row"><div><div class="price-name">زخم الانطلاق (Core Momentum)</div><div class="price-save">2x أسبوعي • 8 نقاط/شهر</div></div>
+      <div style="text-align:center"><div class="price-val">${db.prices.core}</div><div class="price-jd">JD / شهر</div></div></div>
+    <div class="price-row"><div><div class="price-name">عزيمة الإلتزام (The Dedicated)</div><div class="price-save">3x أسبوعي • 12 نقطة/شهر</div></div>
+      <div style="text-align:center"><div class="price-val">${db.prices.dedicated}</div><div class="price-jd">JD / شهر</div></div></div>
+    <div class="price-row"><div><div class="price-name">وتيرة النخبة (Elite Private)</div><div class="price-save">4x أسبوعي • 16 نقطة/شهر</div></div>
+      <div style="text-align:center"><div class="price-val">${db.prices.elite}</div><div class="price-jd">JD / شهر</div></div></div>
+  `;
+
+  // Render Pay as you go bundles rate markup
+  const paygoContainer = document.getElementById('prices-paygo-container');
+  paygoContainer.innerHTML = `
+    <div class="price-row"><div><div class="price-name">باقة حصة واحدة فردية</div></div><div style="text-align:center"><div class="price-val">${db.prices.p1}</div><div class="price-jd">JD</div></div></div>
+    <div class="price-row"><div><div class="price-name">باقة 5 حصص تدريبية</div></div><div style="text-align:center"><div class="price-val">${db.prices.p5}</div><div class="price-jd">JD</div></div></div>
+    <div class="price-row"><div><div class="price-name">باقة 10 حصص تدريبية</div></div><div style="text-align:center"><div class="price-val">${db.prices.p10}</div><div class="price-jd">JD</div></div></div>
+    <div class="price-row"><div><div class="price-name">باقة 25 حصة تدريبية</div></div><div style="text-align:center"><div class="price-val">${db.prices.p25}</div><div class="price-jd">JD</div></div></div>
+    <div class="price-row"><div><div class="price-name">باقة 50 حصة تدريبية</div></div><div style="text-align:center"><div class="price-val">${db.prices.p50}</div><div class="price-jd">JD</div></div></div>
+    <div class="price-row"><div><div class="price-name">باقة 100 حصة تدريبية</div></div><div style="text-align:center"><div class="price-val">${db.prices.p100}</div><div class="price-jd">JD</div></div></div>
+  `;
+}
+
+function openEditPricesModal() {
+  document.getElementById('pr-sub-starter').value = db.prices.starter;
+  document.getElementById('pr-sub-core').value = db.prices.core;
+  document.getElementById('pr-sub-dedicated').value = db.prices.dedicated;
+  document.getElementById('pr-sub-elite').value = db.prices.elite;
+  
+  document.getElementById('pr-p1').value = db.prices.p1;
+  document.getElementById('pr-p5').value = db.prices.p5;
+  document.getElementById('pr-p10').value = db.prices.p10;
+  document.getElementById('pr-p25').value = db.prices.p25;
+  document.getElementById('pr-p50').value = db.prices.p50;
+  document.getElementById('pr-p100').value = db.prices.p100;
+  
+  openModal('modal-edit-prices');
+}
+
+function savePricesConfig() {
+  db.prices.starter = parseInt(document.getElementById('pr-sub-starter').value) || 0;
+  db.prices.core = parseInt(document.getElementById('pr-sub-core').value) || 0;
+  db.prices.dedicated = parseInt(document.getElementById('pr-sub-dedicated').value) || 0;
+  db.prices.elite = parseInt(document.getElementById('pr-sub-elite').value) || 0;
+  
+  db.prices.p1 = parseInt(document.getElementById('pr-p1').value) || 0;
+  db.prices.p5 = parseInt(document.getElementById('pr-p5').value) || 0;
+  db.prices.p10 = parseInt(document.getElementById('pr-p10').value) || 0;
+  db.prices.p25 = parseInt(document.getElementById('pr-p25').value) || 0;
+  db.prices.p50 = parseInt(document.getElementById('pr-p50').value) || 0;
+  db.prices.p100 = parseInt(document.getElementById('pr-p100').value) || 0;
+  
+  save();
+  closeModal('modal-edit-prices');
+  renderPricesPage();
+  db.activity.unshift({ date: today(), text: 'تعديل وتحديث لائحة وباقات الأسعار بالكامل' });
+  showToast('⚙️ تم حفظ وتعميم لائحة الأسعار والمبيعات الجديدة');
+}
+
+// ============ DASHBOARD VIEW LOGIC ============
+function renderDashboard() {
+  const t = today();
+  document.getElementById('stat-members').textContent = db.members.length;
+  document.getElementById('stat-active').textContent = db.subscriptions.filter(s => s.endDate >= t).length;
+  document.getElementById('stat-today-appts').textContent = db.appointments.filter(a => a.date === t).length;
+  
+  const month = t.substring(0, 7);
+  const currentSubTypes = getSubTypesConfig();
+  const rev = db.subscriptions.filter(s => s.createdAt?.startsWith(month)).reduce((a,s) => a + (currentSubTypes[s.type]?.price||0), 0)
+    + db.sessions.filter(s => s.date?.startsWith(month)).reduce((a,s) => a + s.price, 0);
+  document.getElementById('stat-revenue').textContent = rev;
+
+  const todayAppts = db.appointments.filter(a => a.date === t).sort((a,b) => a.time.localeCompare(b.time));
+  const apptEl = document.getElementById('dash-today-appts');
+  if (todayAppts.length) {
+    apptEl.innerHTML = todayAppts.map(a => {
+      const m = db.members.find(x => x.id === a.memberId);
+      return `<div class="appt-card">
+        <div><div class="appt-time">${a.time}</div>
+        <div style="font-weight:700;font-size:17px">${m?.name||'—'}</div>
+        <div class="appt-type">${a.workout}</div></div>
+        <span class="badge ${a.peakType==='peak'?'badge-gold':'badge-blue'}">${a.peakType==='peak'?'⚡ Peak':'Off-Peak'}</span>
+      </div>`;
+    }).join('');
+  } else {
+    apptEl.innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div><p>لا توجد مواعيد مضافة لليوم</p></div>`;
+  }
+
+  const lowCredit = db.subscriptions.filter(s => s.endDate >= t && s.creditsLeft <= 2);
+  const lcEl = document.getElementById('dash-low-credits');
+  if (lowCredit.length) {
+    lcEl.innerHTML = lowCredit.map(s => {
+      const m = db.members.find(x => x.id === s.memberId);
+      return `<div class="alert alert-warning" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+        <div>⚠️ <strong>${m?.name}</strong> – الرصيد المتبقي الحرج (${s.creditsLeft}) نقاط!</div>
+        <button class="btn btn-sm btn-gold" onclick="openEditSubscription('${s.id}')">تعديل / شحن</button>
+      </div>`;
+    }).join('');
+  } else {
+    lcEl.innerHTML = `<div style="color:var(--muted);font-size:17px;padding:12px">✅ كافة سجلات المشتركين النشطة تمتلك أرصدة كافية ومستقرة</div>`;
+  }
+}
+
+// ============ REPORTS CALCULATIONS ============
+function renderReports() {
+  const t = today();
+  const currentSubTypes = getSubTypesConfig();
+  const bySub = {};
+  db.subscriptions.filter(s => s.endDate >= t).forEach(s => {
+    bySub[s.type] = (bySub[s.type] || 0) + 1;
+  });
+  const subEl = document.getElementById('report-by-sub');
+  subEl.innerHTML = Object.entries(bySub).length
+    ? Object.entries(bySub).map(([type, count]) => `
+      <div class="price-row">
+        <span>${currentSubTypes[type]?.name || type}</span>
+        <span class="badge badge-gold">${count} عضو</span>
+      </div>`).join('')
+    : '<div style="color:var(--muted);padding:12px;font-size:17px">لا توجد سجلات باقات نشطة</div>';
+
+  const sessEl = document.getElementById('report-sessions');
+  const totalSess = db.sessions.reduce((a,s) => a + s.price, 0);
+  const totalPending = db.sessions.reduce((a,s) => a + s.remaining, 0);
+  sessEl.innerHTML = `
+    <div class="price-row"><span>إجمالي إيراد الحصص</span><span style="color:var(--gold);font-weight:700">${totalSess} JD</span></div>
+    <div class="price-row"><span>عدد الصفقات الكلي</span><span class="badge badge-blue">${db.sessions.length}</span></div>
+    <div class="price-row"><span>حصص بانتظار الاستهلاك</span><span class="badge badge-gold">${totalPending}</span></div>
+  `;
+
+  const month = t.substring(0, 7);
+  const monthAppts = db.appointments.filter(a => a.date.startsWith(month));
+  const apptEl = document.getElementById('report-appts');
+  apptEl.innerHTML = `
+    <div class="price-row"><span>حجوزات هذا الشهر</span><span class="badge badge-green">${monthAppts.length} موعد</span></div>
+    <div class="price-row"><span>ساعات Peak</span><span class="badge badge-gold">${monthAppts.filter(a=>a.peakType==='peak').length}</span></div>
+    <div class="price-row"><span>ساعات Off-Peak</span><span class="badge badge-blue">${monthAppts.filter(a=>a.peakType==='offpeak').length}</span></div>
+  `;
+
+  const actEl = document.getElementById('report-activity');
+  actEl.innerHTML = db.activity.slice(0,15).map(a => `
+    <div style="padding:10px 0;border-bottom:1px solid #eee;font-size:17px;display:flex;justify-content:space-between">
+      <span>${a.text}</span>
+      <span style="color:var(--muted);font-size:15px">${formatDate(a.date)}</span>
+    </div>
+  `).join('') || '<div style="color:var(--muted);padding:12px;font-size:17px">لا توجد أنشطة مسجلة بالنظام حالياً</div>';
+}
+
+// ============ HIGH FLEXIBILITY SELECTION CUSTOM EXPORTS (EXCEL / PDF) ============
+function exportToExcelCustom() {
+  let csvContent = "\uFEFF"; // UTF-8 BOM representation for correct Arabic character formatting inside spreadsheet viewers like MS Excel
+  const currentSubTypes = getSubTypesConfig();
+
+  if (document.getElementById('chk-exp-members').checked) {
+    csvContent += "--- سجل الأعضاء المشتركين ---\n";
+    csvContent += "المعرف, الاسم الكامل, رقم الهاتف, البريد الإلكتروني, الجنس, تاريخ التسجيل\n";
+    db.members.forEach(m => {
+      csvContent += `"${m.id}","${m.name}","${m.phone || '—'}","${m.email || '—'}","${m.gender || '—'}","${m.createdAt || '—'}"\n`;
+    });
+    csvContent += "\n";
+  }
+
+  if (document.getElementById('chk-exp-subs').checked) {
+    csvContent += "--- سجل الاشتراكات الشهرية ---\n";
+    csvContent += "العضو, باقة الاشتراك, تاريخ البداية, تاريخ الانتهاء, النقاط المتبقية\n";
+    db.subscriptions.forEach(s => {
+      const m = db.members.find(x => x.id === s.memberId);
+      csvContent += `"${m?.name || '—'}","${currentSubTypes[s.type]?.name || s.type}","${s.startDate}","${s.endDate}","${s.creditsLeft}"\n`;
+    });
+    csvContent += "\n";
+  }
+
+  if (document.getElementById('chk-exp-appts').checked) {
+    csvContent += "--- سجل المواعيد والجدولة ---\n";
+    csvContent += "التاريخ, الوقت, اسم العضو, نوع التمرين, نوع الساعة التكليفية\n";
+    db.appointments.forEach(a => {
+      const m = db.members.find(x => x.id === a.memberId);
+      csvContent += `"${a.date}","${a.time}","${m?.name || '—'}","${a.workout}","${a.peakType === 'peak' ? 'Peak' : 'Off-Peak'}"\n`;
+    });
+    csvContent += "\n";
+  }
+
+  if (document.getElementById('chk-exp-sessions').checked) {
+    csvContent += "--- سجل الحصص المباعة ---\n";
+    csvContent += "اسم العضو, إجمالي الحصص, المتبقي, القيمة المدفوعة, طريقة السداد, التاريخ\n";
+    db.sessions.forEach(s => {
+      const m = db.members.find(x => x.id === s.memberId);
+      csvContent += `"${m?.name || '—'}","${s.total}","${s.remaining}","${s.price} JD","${s.payment}","${s.date}"\n`;
+    });
+  }
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `The_Concept_Report_${today()}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast("📊 تم استخراج وتنزيل ملف Excel بنجاح");
+}
+
+function exportToPDFCustom() {
+  const currentSubTypes = getSubTypesConfig();
+  // Build a highly optimized isolated clean dynamic printable DOM segment instance representation markup
+  let printWindow = window.open('', '_blank');
+  let html = `
+    <html lang="ar" dir="rtl">
+    <head>
+      <title>تقرير نظام الإدارة المخصص - The Concept</title>
+      <style>
+        body { font-family: 'Cairo', sans-serif; padding: 30px; color: #000; background: #fff; }
+        h1 { text-align: center; font-size: 24px; margin-bottom: 5px; }
+        h2 { border-bottom: 2px solid #000; padding-bottom: 5px; font-size: 18px; margin-top: 30px; }
+        .date { text-align: center; font-size: 14px; color: #666; margin-bottom: 3px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: right; }
+        th { background-color: #f0f0f0; }
+      </style>
+    </head>
+    <body>
+      <h1>The Concept | كشف البيانات المخصص</h1>
+      <div class="date">تاريخ الاستخراج الأصلي للتقرير: ${formatDate(today())}</div>
+  `;
+
+  if (document.getElementById('chk-exp-members').checked) {
+    html += `<h2>👥 سجل الأعضاء والعملاء المسجلين</h2>
+    <table>
+      <thead><tr><th>الاسم الكامل</th><th>رقم الهاتف</th><th>البريد الإلكتروني</th><th>الجنس</th><th>تاريخ التسجيل</th></tr></thead><tbody>`;
+    db.members.forEach(m => {
+      html += `<tr><td>${m.name}</td><td>${m.phone || '—'}</td><td>${m.email || '—'}</td><td>${m.gender || '—'}</td><td>${formatDate(m.createdAt)}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+
+  if (document.getElementById('chk-exp-subs').checked) {
+    html += `<h2>📋 سجل قيود الاشتراكات الشهرية</h2>
+    <table>
+      <thead><tr><th>العضو</th><th>باقة المشترك</th><th>تاريخ البداية</th><th>تاريخ الانتهاء</th><th>النقاط المتبقية</th></tr></thead><tbody>`;
+    db.subscriptions.forEach(s => {
+      const m = db.members.find(x => x.id === s.memberId);
+      html += `<tr><td>${m?.name || '—'}</td><td>${currentSubTypes[s.type]?.name || s.type}</td><td>${formatDate(s.startDate)}</td><td>${formatDate(s.endDate)}</td><td>${s.creditsLeft} / ${s.totalCredits}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+
+  if (document.getElementById('chk-exp-appts').checked) {
+    html += `<h2>📅 بيان وجدولة المواعيد</h2>
+    <table>
+      <thead><tr><th>التاريخ واليوم</th><th>توقيت الحضور</th><th>اسم العضو</th><th>نوع التمرين والملاحظة</th><th>فئة الحجز والتكلفة</th></tr></thead><tbody>`;
+    db.appointments.forEach(a => {
+      const m = db.members.find(x => x.id === a.memberId);
+      html += `<tr><td>${formatDate(a.date)}</td><td>${a.time}</td><td>${m?.name || '—'}</td><td>${a.workout}</td><td>${a.peakType === 'peak' ? '⚡ Peak' : 'Off-Peak'} (${a.creditCost} نقطة)</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+
+  if (document.getElementById('chk-exp-sessions').checked) {
+    html += `<h2>💪 كشف عمليات بيع باقات الحصص (Pay As You Go)</h2>
+    <table>
+      <thead><tr><th>اسم العضو</th><th>الباقة المشتراة</th><th>الحصص المتبقية</th><th>القيمة المستحقة</th><th>قناة السداد الدفع</th><th>تاريخ الشراء</th></tr></thead><tbody>`;
+    db.sessions.forEach(s => {
+      const m = db.members.find(x => x.id === s.memberId);
+      html += `<tr><td>${m?.name || '—'}</td><td>${s.total} حصة</td><td>${s.remaining} حصة متبقية</td><td>${s.price} JD</td><td>${s.payment}</td><td>${formatDate(s.date)}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+
+  html += `</body></html>`;
+  
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.focus();
+  // Trigger standard PDF browser system generation UI print dialogues safely 
+  setTimeout(() => { printWindow.print(); }, 600);
+}
+
+
+// ============ INITIALIZATION ACTIONS ============
+document.getElementById('top-date').textContent = new Date().toLocaleDateString('ar-EG', {
+  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+});
+
+document.getElementById('sub-start').addEventListener('change', updateSubDetails);
+document.getElementById('sub-type').addEventListener('change', updateSubDetails);
+
+initCal();
+renderDashboard();
+renderPricesPage();
+</script>
+</body>
+</html>
