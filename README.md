@@ -24,4 +24,22 @@ Since this application runs entirely in the browser, no backend server build ste
 1. Clone or download this repository.
 2. Ensure your logo file is placed under the `./assets/` directory:
    ```text
-   assets/THE CONCEPT LOGO trace.png
+   assets/THE CONCEPT LOGO trace.png   ```
+3. Open `index.html` in any modern browser.
+
+## Desktop Edition (Electron + SQLite)
+
+The `desktop-app/` folder holds an earlier offline desktop build of the same system. It stores its data in a local SQLite database instead of the browser.
+
+- **Stack:** Electron 29, Node.js, SQLite (`sqlite3`)
+- **Data model:** `members`, `appointments`, `finance`, `attendance`, `installments`
+- **Features:** member CRUD, appointment booking, attendance logging, installment plans with payment tracking, financial reports
+- **Architecture:** the renderer talks to the main process over IPC (`ipcRenderer.invoke`), and all database access stays in `main.js`
+
+```bash
+cd desktop-app
+npm install
+npm start
+```
+
+The database file (`gym_database.sqlite`) is created automatically on first run and is git-ignored, so no real member data is ever committed.

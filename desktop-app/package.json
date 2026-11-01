@@ -1,0 +1,14 @@
+{
+  "name": "the-concept-app",
+  "version": "1.0.0",
+  "description": "Gym and Private Studio Management System",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^29.0.0",
+    "sqlite3": "^5.1.7",
+    "whatsapp-web.js": "^1.23.0"
+  }
+}

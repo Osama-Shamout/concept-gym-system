@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>The Concept - Advanced Gym System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- القائمة الجانبية -->
+    <div class="w-64 bg-white border-l border-gray-200 shadow-sm p-6 flex flex-col justify-between z-10 overflow-y-auto">
+        <div>
+            <div class="text-center mb-8">
+                <img src="THE CONCEPT LOGO.png" alt="The Concept Logo" class="w-32 mx-auto object-contain mb-2" onerror="this.style.display='none'">
+                <h1 class="text-lg font-black text-black tracking-widest uppercase">The Concept</h1>
+                <span class="text-xs text-gray-500 tracking-widest">Fitness & More</span>
+            </div>
+            <nav class="space-y-3">
+                <button onclick="showTab('dashboard')" class="w-full text-right py-3 px-4 rounded-lg bg-gray-50 hover:bg-black hover:text-white transition font-semibold border border-gray-100 text-gray-800">لوحة التحكم</button>
+                <button onclick="showTab('members')" class="w-full text-right py-3 px-4 rounded-lg bg-gray-50 hover:bg-black hover:text-white transition font-semibold border border-gray-100 text-gray-800">إدارة المشتركين</button>
+                <button onclick="showTab('installmentsTab')" class="w-full text-right py-3 px-4 rounded-lg bg-gray-50 hover:bg-black hover:text-white transition font-semibold border border-gray-100 text-gray-800">نظام الأقساط</button>
+                <button onclick="showTab('scheduler')" class="w-full text-right py-3 px-4 rounded-lg bg-gray-50 hover:bg-black hover:text-white transition font-semibold border border-gray-100 text-gray-800">نظام الحجز الذكي</button>
+                <button onclick="showTab('financeTab')" class="w-full text-right py-3 px-4 rounded-lg bg-gray-50 hover:bg-black hover:text-white transition font-semibold border border-gray-100 text-gray-800">التقارير المالية</button>
+            </nav>
+        </div>
+        <div class="text-xs text-gray-400 text-center font-semibold mt-4">Pro Version 3.0</div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="flex-1 p-10 overflow-y-auto">
+        
+        <!-- 1. لوحة التحكم -->
+        <div id="dashboard" class="tab-content active">
+            <h2 class="text-3xl font-black mb-8 text-black">نظرة عامة</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
+                    <p class="text-gray-500 font-semibold mb-2">المشتركين المسجلين</p>
+                    <p id="dash-members-count" class="text-5xl font-black text-black">0</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
+                    <p class="text-gray-500 font-semibold mb-2">إجمالي الإيرادات</p>
+                    <p id="dash-finance-total" class="text-5xl font-black text-black">0 <span class="text-lg text-gray-400">JD</span></p>
+                </div>
+                <div class="bg-black p-8 rounded-xl shadow-lg text-white flex flex-col justify-center items-center cursor-pointer hover:bg-gray-800 transition" onclick="showTab('members'); toggleModal('memberModal'); document.getElementById('modal-title').innerText='مشترك جديد';">
+                    <p class="text-xl font-bold">+ إضافة مشترك</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. إدارة المشتركين -->
+        <div id="members" class="tab-content">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-black text-black">قاعدة بيانات المشتركين</h2>
+                <div class="flex space-x-4 space-x-reverse">
+                    <input type="text" id="search-input" onkeyup="filterMembers()" placeholder="بحث بالاسم أو الرقم..." class="bg-white border border-gray-300 text-black px-4 py-2 rounded-lg w-64 focus:outline-none focus:border-black">
+                    <button onclick="openAddMemberModal()" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-6 rounded-lg transition shadow-md">+ إضافة مشترك</button>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <table class="w-full text-right">
+                    <thead class="bg-gray-50 text-gray-600 border-b border-gray-200">
+                        <tr>
+                            <th class="p-4 font-bold">الاسم الكامل</th>
+                            <th class="p-4 font-bold">الهاتف</th>
+                            <th class="p-4 font-bold">النقاط</th>
+                            <th class="p-4 font-bold">الحصص</th>
+                            <th class="p-4 font-bold text-center">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="members-table-body" class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. نظام الأقساط -->
+        <div id="installmentsTab" class="tab-content">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-black text-black">نظام إدارة الأقساط</h2>
+                <button onclick="openAddInstallmentModal()" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-6 rounded-lg transition shadow-md">+ جدولة قسط جديد</button>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <table class="w-full text-right">
+                    <thead class="bg-gray-50 text-gray-600 border-b border-gray-200">
+                        <tr>
+                            <th class="p-4 font-bold">المشترك</th>
+                            <th class="p-4 font-bold">المبلغ المطلوب</th>
+                            <th class="p-4 font-bold">تاريخ الاستحقاق</th>
+                            <th class="p-4 font-bold">الحالة</th>
+                            <th class="p-4 font-bold">إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="installments-table-body" class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 4. نظام الحجز -->
+        <div id="scheduler" class="tab-content">
+            <h2 class="text-3xl font-black mb-8 text-black">حجز موعد (خصم النقاط التلقائي)</h2>
+            <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-sm max-w-2xl">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">اختر المشترك:</label>
+                        <select id="schedule-member-select" class="w-full bg-gray-50 p-3 rounded-lg border border-gray-300 text-black focus:outline-none focus:border-black"></select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">التاريخ:</label>
+                            <input type="date" id="schedule-date" class="w-full bg-gray-50 p-3 rounded-lg border border-gray-300 text-black focus:outline-none focus:border-black">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">الوقت:</label>
+                            <input type="time" id="schedule-time" class="w-full bg-gray-50 p-3 rounded-lg border border-gray-300 text-black focus:outline-none focus:border-black">
+                        </div>
+                    </div>
+                    <button onclick="makeAppointment()" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-4 rounded-lg transition text-lg shadow-md">تأكيد الموعد</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. التقرير المالي -->
+        <div id="financeTab" class="tab-content">
+            <h2 class="text-3xl font-black mb-8 text-black">السجل المالي</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <table class="w-full text-right">
+                    <thead class="bg-gray-50 text-gray-600 border-b border-gray-200">
+                        <tr>
+                            <th class="p-4 font-bold">المشترك</th>
+                            <th class="p-4 font-bold">البيان</th>
+                            <th class="p-4 font-bold">المبلغ المدفوع</th>
+                            <th class="p-4 font-bold">التاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="finance-table-body" class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة/تعديل مشترك (تدعم بيانات أكثر) -->
+    <div id="memberModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-[500px]">
+            <h3 id="modal-title" class="text-2xl font-black text-black mb-6">مشترك جديد</h3>
+            <input type="hidden" id="edit-member-id">
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">الاسم الأول <span class="text-red-500">*</span></label>
+                    <input type="text" id="member-fname" class="w-full bg-gray-50 p-3 rounded-lg border border-gray-300 text-black">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">الاسم الأخير <span class="text-red-500">*</span></label>
+                    <input type="text" id="member-lname" class="w-full bg-gray-50 p-3 rounded-lg border border-gray-300 text-black">
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">رقم الهاتف <span class="text-red-500">*</span></label>
+                    <input type="text" id="member-phone" class="w-full bg-gray-50 p-3 rounded-lg border border-gray-300 text-black">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-500 mb-1">البريد الإلكتروني (اختياري)</label>
+                    <input type="email" id="member-email" class="w-full bg-gray-50 p-3 rounded-lg border border-gray-300 text-black">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-500 mb-1">ملاحظات طبية / أهداف (اختياري)</label>
+                    <textarea id="member-notes" class="w-full bg-gray-50 p-3 rounded-lg border border-gray-300 text-black" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 space-x-reverse mt-8">
+                <button onclick="toggleModal('memberModal')" class="bg-gray-200 text-black font-bold px-5 py-2.5 rounded-lg hover:bg-gray-300">إلغاء</button>
+                <button onclick="saveMember()" class="bg-black text-white font-bold px-5 py-2.5 rounded-lg hover:bg-gray-800">حفظ البيانات</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة قسط -->
+    <div id="installmentModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-[450px]">
+            <h3 class="text-2xl font-black text-black mb-6">جدولة قسط مالي</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">اختر المشترك</label>
+                    <select id="inst-member" class="w-full bg-gray-50 p-3 rounded-lg border border-gray-300 text-black"></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">قيمة القسط (JD)</label>
+                    <input type="number" id="inst-amount" class="w-full bg-gray-50 p-3 rounded-lg border border-gray-300 text-black">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">تاريخ الاستحقاق الدفع</label>
+                    <input type="date" id="inst-date" class="w-full bg-gray-50 p-3 rounded-lg border border-gray-300 text-black">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 space-x-reverse mt-8">
+                <button onclick="toggleModal('installmentModal')" class="bg-gray-200 text-black font-bold px-5 py-2.5 rounded-lg hover:bg-gray-300">إلغاء</button>
+                <button onclick="saveInstallment()" class="bg-black text-white font-bold px-5 py-2.5 rounded-lg hover:bg-gray-800">اعتماد القسط</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        let allMembers = [];
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if(tabId === 'members') loadMembers();
+            if(tabId === 'scheduler') loadMembersForSelect('schedule-member-select');
+            if(tabId === 'installmentsTab') { loadInstallments(); loadMembersForSelect('inst-member'); }
+            if(tabId === 'financeTab' || tabId === 'dashboard') loadFinancials();
+        }
+
+        function toggleModal(modalId) { document.getElementById(modalId).classList.toggle('hidden'); }
+
+        async function loadMembers() {
+            allMembers = await ipcRenderer.invoke('get-members');
+            renderMembersTable(allMembers);
+            document.getElementById('dash-members-count').innerText = allMembers.length;
+        }
+
+        function renderMembersTable(members) {
+            const tbody = document.getElementById('members-table-body');
+            tbody.innerHTML = '';
+            members.forEach(m => {
+                const fullName = `${m.first_name} ${m.last_name}`;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-4 text-black font-bold">${fullName}</td>
+                        <td class="p-4 text-gray-600">${m.phone}</td>
+                        <td class="p-4"><span class="bg-gray-100 text-black px-3 py-1 rounded-full font-bold text-sm border border-gray-200">${m.credits}</span></td>
+                        <td class="p-4"><span class="bg-gray-100 text-black px-3 py-1 rounded-full font-bold text-sm border border-gray-200">${m.sessions}</span></td>
+                        <td class="p-4 flex space-x-2 space-x-reverse justify-center">
+                            <button onclick="logAttendance(${m.id}, '${m.first_name}')" class="bg-white border border-gray-300 text-black text-xs px-3 py-1.5 rounded hover:bg-gray-100 shadow-sm">حضور</button>
+                            <button onclick="openEditMember(${m.id})" class="bg-gray-800 text-white text-xs px-3 py-1.5 rounded hover:bg-black shadow-sm">تعديل</button>
+                            <button onclick="deleteMember(${m.id})" class="bg-red-50 text-red-600 border border-red-200 text-xs px-3 py-1.5 rounded hover:bg-red-100 shadow-sm">حذف</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterMembers() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filtered = allMembers.filter(m => 
+                (m.first_name + ' ' + m.last_name).toLowerCase().includes(query) || m.phone.includes(query)
+            );
+            renderMembersTable(filtered);
+        }
+
+        function openAddMemberModal() {
+            document.getElementById('edit-member-id').value = '';
+            document.getElementById('modal-title').innerText = 'مشترك جديد';
+            document.getElementById('member-fname').value = '';
+            document.getElementById('member-lname').value = '';
+            document.getElementById('member-phone').value = '';
+            document.getElementById('member-email').value = '';
+            document.getElementById('member-notes').value = '';
+            toggleModal('memberModal');
+        }
+
+        function openEditMember(id) {
+            const m = allMembers.find(x => x.id === id);
+            if(!m) return;
+            document.getElementById('edit-member-id').value = m.id;
+            document.getElementById('modal-title').innerText = 'تعديل بيانات المشترك';
+            document.getElementById('member-fname').value = m.first_name;
+            document.getElementById('member-lname').value = m.last_name;
+            document.getElementById('member-phone').value = m.phone;
+            document.getElementById('member-email').value = m.email || '';
+            document.getElementById('member-notes').value = m.notes || '';
+            toggleModal('memberModal');
+        }
+
+        async function saveMember() {
+            const id = document.getElementById('edit-member-id').value;
+            const data = {
+                id: id,
+                firstName: document.getElementById('member-fname').value,
+                lastName: document.getElementById('member-lname').value,
+                phone: document.getElementById('member-phone').value,
+                email: document.getElementById('member-email').value,
+                notes: document.getElementById('member-notes').value,
+                credits: 0, sessions: 0
+            };
+            
+            if(!data.firstName || !data.lastName || !data.phone) return alert('يرجى ملء الاسم الأول والأخير ورقم الهاتف (حقول إجبارية)');
+            
+            if(id) { await ipcRenderer.invoke('edit-member', data); } 
+            else { await ipcRenderer.invoke('add-member', data); }
+            
+            toggleModal('memberModal');
+            loadMembers();
+        }
+
+        async function deleteMember(id) {
+            if(confirm("هل أنت متأكد من حذف هذا المشترك نهائياً؟")) {
+                await ipcRenderer.invoke('delete-member', id);
+                loadMembers();
+            }
+        }
+
+        // --- نظام الأقساط ---
+        function openAddInstallmentModal() {
+            document.getElementById('inst-amount').value = '';
+            document.getElementById('inst-date').valueAsDate = new Date();
+            loadMembersForSelect('inst-member');
+            toggleModal('installmentModal');
+        }
+
+        async function saveInstallment() {
+            const memberId = document.getElementById('inst-member').value;
+            const amount = document.getElementById('inst-amount').value;
+            const dueDate = document.getElementById('inst-date').value;
+            if(!memberId || !amount || !dueDate) return alert('يرجى تعبئة جميع الحقول');
+            
+            await ipcRenderer.invoke('add-installment', { memberId, amount, dueDate });
+            toggleModal('installmentModal');
+            loadInstallments();
+        }
+
+        async function loadInstallments() {
+            const installments = await ipcRenderer.invoke('get-installments');
+            const tbody = document.getElementById('installments-table-body');
+            tbody.innerHTML = '';
+            installments.forEach(i => {
+                const statusHtml = i.is_paid ? `<span class="text-green-600 font-bold">مدفوع (${i.paid_date})</span>` : `<span class="text-red-500 font-bold">مستحق الدفع</span>`;
+                const btnHtml = i.is_paid ? `-` : `<button onclick="payInstallment(${i.id}, ${i.amount}, ${i.member_id})" class="bg-black text-white text-xs px-4 py-2 rounded hover:bg-gray-800">تسديد</button>`;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 text-black font-bold">${i.first_name} ${i.last_name}</td>
+                        <td class="p-4 font-bold text-black">${i.amount} JD</td>
+                        <td class="p-4 text-gray-600">${i.due_date}</td>
+                        <td class="p-4">${statusHtml}</td>
+                        <td class="p-4">${btnHtml}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function payInstallment(installmentId, amount, memberId) {
+            if(confirm(`تأكيد تسديد مبلغ ${amount} JD من هذا القسط؟`)) {
+                await ipcRenderer.invoke('pay-installment', { installmentId, amount, memberId });
+                loadInstallments();
+                alert('تم تسديد القسط وتسجيله في المالية بنجاح!');
+            }
+        }
+
+        async function loadMembersForSelect(selectId) {
+            if (allMembers.length === 0) allMembers = await ipcRenderer.invoke('get-members');
+            const select = document.getElementById(selectId);
+            select.innerHTML = '';
+            allMembers.forEach(m => {
+                select.innerHTML += `<option value="${m.id}">${m.first_name} ${m.last_name}</option>`;
+            });
+        }
+
+        async function logAttendance(memberId, firstName) {
+            const date = new Date().toLocaleDateString('en-CA');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            if(await ipcRenderer.invoke('log-attendance', { memberId, date, time })) alert(`تم تسجيل حضور ${firstName}!`);
+        }
+
+        async function makeAppointment() {
+            const memberId = document.getElementById('schedule-member-select').value;
+            const date = document.getElementById('schedule-date').value;
+            const timeStr = document.getElementById('schedule-time').value;
+            if(!date || !timeStr) return alert('الرجاء تحديد التاريخ والوقت');
+            const res = await ipcRenderer.invoke('book-appointment', { memberId, date, timeStr });
+            alert(res.msg);
+        }
+
+        async function loadFinancials() {
+            const report = await ipcRenderer.invoke('get-financial-report');
+            document.getElementById('dash-finance-total').innerText = report.totalRevenue || 0;
+            const tbody = document.getElementById('finance-table-body');
+            tbody.innerHTML = '';
+            report.transactions.forEach(t => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-bold text-black">${t.first_name} ${t.last_name}</td>
+                        <td class="p-4 text-gray-600">${t.package_name}</td>
+                        <td class="p-4 font-bold text-black">${t.amount} JD</td>
+                        <td class="p-4 text-gray-500">${t.date}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('schedule-date').valueAsDate = new Date();
+        loadMembers(); loadFinancials();
+    </script>
+</body>
+</html>
